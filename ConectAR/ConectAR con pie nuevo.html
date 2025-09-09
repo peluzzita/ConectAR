@@ -1,0 +1,1837 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>ConectAR — Conectar Bandas Argentinas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg: #0f1220;
+      --panel: #171a2b;
+      --muted: #8b90a7;
+      --text: #e9ecf1;
+      --brand: #6ee7ff;
+      --brand-2: #a78bfa;
+      --ok: #34d399;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --shadow: 0 10px 25px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.2);
+      --radius: 18px;
+    }
+    :root{
+      --ar-celeste: #77c7ff;   /* acento bandera */
+      --ar-celeste-2: #bfe6ff; /* tono más claro */
+    }
+    .title .ar{
+      background: linear-gradient(180deg, var(--ar-celeste), #ffffff 50%, var(--ar-celeste));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      font-weight: 900;
+    }
+    .title{
+      position: relative;
+      display: inline-block;
+      padding-bottom: 4px;
+   }
+    .title::after{
+      content: "";
+      position: absolute; left: 0; bottom: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, var(--ar-celeste), var(--brand-2));
+      opacity: .55; border-radius: 2px;
+}
+    * { box-sizing: border-box; }
+    body{
+      margin:0; background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(167,139,250,.18), transparent 60%),
+        radial-gradient(800px 600px at 110% 10%, rgba(110,231,255,.12), transparent 60%),
+        var(--bg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Ubuntu, Cantarell, "Noto Sans", "DejaVu Sans", Arial, "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: start center;
+      padding: 40px 16px 80px;
+    }
+    .app{
+      width: min(980px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)) , var(--panel);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 3vw, 28px);
+    }
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 18px;
+    }
+    .title{
+      font-weight: 800; letter-spacing:.2px;
+      font-size: clamp(18px, 2.4vw, 26px);
+      line-height:1.2;
+      background: linear-gradient(90deg, var(--brand), var(--brand-2));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .subtitle{ color: var(--muted); font-size: 13px; margin-top:6px }
+    .row{
+      display:grid; grid-template-columns: 1fr auto 1fr; gap:12px; align-items:end; margin: 12px 0 8px;
+    }
+    .field{
+      display:flex; flex-direction:column; gap:8px;
+    }
+    label{ font-size: 12px; color: var(--muted) }
+    input[type="text"]{
+      width:100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: #111423;
+      color: var(--text);
+      outline: none;
+      box-shadow: inset 0 0 0 0 rgba(0,0,0,0);
+      transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+      font-size: 15px;
+    }
+    input[type="text"]:focus{ border-color: rgba(110,231,255,.35); box-shadow: 0 0 0 4px rgba(110,231,255,.08) }
+    .btn{
+      appearance:none; border:0; border-radius: 12px; padding: 12px 14px; cursor:pointer; font-weight: 700;
+      color:#0d0f1c; background: linear-gradient(90deg, var(--brand), var(--brand-2));
+      box-shadow: var(--shadow); white-space:nowrap; transition: transform .06s ease;
+    }
+    .btn:active{ transform: translateY(1px) }
+    .btn.secondary{
+      background: #0f1220; color: var(--text);
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: none;
+    }
+    .divider{
+      display:grid; place-items:center; margin: 0 4px 8px;
+    }
+    .chip{
+      font-size: 11px; color: #0e111d; background: linear-gradient(90deg, var(--brand), var(--brand-2)); padding: 3px 8px; border-radius: 999px; font-weight:800; letter-spacing:.3px;
+    }
+    .actions{
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end; margin: 4px 0 12px;
+    }
+    .msg{ margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; background: #12152a; color: var(--muted); border: 1px dashed rgba(255,255,255,.12); font-size: 14px; }
+    .results{
+      margin-top: 16px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .steps{
+      display:flex; flex-direction:column; gap:8px; margin-top:10px;
+    }
+    .step{
+      display:grid; grid-template-columns: auto 1fr; gap:10px; align-items:start; background: #12152a; border:1px solid rgba(255,255,255,.06); border-radius: 14px; padding: 12px;
+    }
+    .step .num{
+      --sz: 28px; width: var(--sz); height: var(--sz); display:grid; place-items:center;
+      border-radius: 50%; background:#0e1021; border: 1px solid rgba(255,255,255,.08);
+      font-weight:800; color: var(--brand);
+    }
+    .node{ font-weight:800; color:#fff }
+    .node.person{ color: var(--ok) }
+    .node.group{ color: #e0e4ff }
+    .muted{ color: var(--muted) }
+    .success{ color: var(--ok) }
+    .warning{ color: var(--warn) }
+    .danger{ color: var(--bad) }
+    footer{ margin-top: 18px; font-size: 12px; color: var(--muted) }
+    .legend{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top: 8px;}
+    .legend .dot{ width:10px; height:10px; border-radius:50%;}
+    .dot.person{ background: var(--ok) }
+    .dot.group{ background: #e0e4ff }
+    .sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip: rect(1px,1px,1px,1px); white-space:nowrap }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <div class="title">Conect<span class="ar">AR</span></div>
+        <div class="subtitle">Conectar bandas argentinas por sus integrantes</div>
+      </div>
+      <div class="legend" aria-hidden="true">
+        <div class="dot group" title="Grupo"></div><span class="muted">Grupo</span>
+        <div class="dot person" title="Persona"></div><span class="muted">Persona</span>
+      </div>
+    </header>
+
+    <div class="row">
+      <div class="field">
+        <label for="g1">Banda A</label>
+        <input id="g1" list="bandas" placeholder="Escribí una banda (p. ej., Patricio Rey…)" autocomplete="off" />
+      </div>
+
+      <div class="divider">
+        <button id="randomBtn" class="btn secondary" title="Elegir dos bandas al azar">ALEATORIO</button>
+      </div>
+
+      <div class="field">
+        <label for="g2">Banda B</label>
+        <input id="g2" list="bandas" placeholder="Escribí otra banda (p. ej., Los Beatniks…)" autocomplete="off" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="swapBtn" class="btn secondary" title="Intercambiar bandas">↔ Intercambiar</button>
+      <button id="goBtn" class="btn">CONECTAR</button>
+    </div>
+
+    <datalist id="bandas"></datalist>
+
+    <div id="msg" class="msg" role="status">Elegí dos grupos y presioná <b>CONECTAR</b>. También podés usar <b>ALEATORIO</b>.</div>
+
+    <section id="results" class="results" hidden>
+      <h3 id="headline" style="margin:0 0 8px 0;">Resultado</h3>
+      <div id="summary" class="muted"></div>
+      <div id="steps" class="steps"></div>
+    </section>
+
+    <footer>
+      Datos incrustados desde: <em> Wikipedia, RateYourMusic, Rock.com.ar, Octavado, La Nave del Rock Argentino</em>.
+    </footer>
+  </div>
+
+  <!-- El TXT crudo va incrustado acá -->
+  <script type="text/plain" id="data-txt">
+#ARTISTAS
+
+Alberto Hualde: Los Guantes Negros✅, Alma y Vida✅
+Adalberto Cevasco: El Trío✅, Cuero✅
+Aitór: Virus✅, Juana la Loca✅
+Alejandro Lerner: Nito Mestre y Los Desconocidos de Siempre✅, Soluna✅
+Alejandro Medina Billy Bond y La Pesada del Rock and Roll✅, Manal✅, Pappo's Blues✅
+Alfredo Toth: Los Criss Cross✅, Los Gatos✅, G.I.T.✅, Nito Mestre y Los Desconocidos de Siempre✅, Sacramento✅
+Andrés Calamaro: Los Abuelos de la Nada✅, Comida China✅, Raíces✅, Trigémino✅
+Andrés Ciro Martínez: Ciro y los Persas✅, Los Piojos✅
+Antonio Romano: Hermética✅, Malón✅
+Ariel Minimal: Los Fabulosos Cadillacs✅, Martes Menta, Pez✅, El Siempreterno✅
+Bernardo Baraj: Alma y Vida✅, Cuero✅
+Beto Satragni: Raíces✅, Spinetta Jade✅, El 60
+Billy Bond: Billy Bond y la Pesada del Rock and Roll✅, Los Guantes Negros✅
+Black Amaya: Pappo's Blues✅, Billy Bond y La Pesada del Rock and Roll✅, Pescado Rabioso✅, Los Robertones✅
+Boff: Boxer, Pappo's Blues✅, Pappo y Hoy No Es Hoy✅, Riff✅
+Cacho D'Arias: Engranaje✅, Plus✅, Orions✅
+Carlos Cutaia: Lila✅, La Máquina de Hacer Pájaros✅, Pescado Rabioso✅
+Carlos Machi Rufino: Pappo's Blues✅, Invisible✅, Tantor✅
+Carlos Piégari: Avatar✅, Sui Generis✅
+Carlos Rignati: Materia Gris✅, Alas✅
+Carlos Tapia: Juana La loca✅, Turf✅
+Cacho Lafalce: Huinca✅, Billy Bond y La Pesada del Rock and Roll✅
+César Franov: Grupo Encuentro✅, Madre Atómica✅, Spinetta Jade✅
+Charly García: La Máquina de Hacer Pájaros✅, PorSuiGieco✅, Serú Girán✅, Sui Generis✅
+Christian Basso: La Portuaria✅, Fricción✅
+Chucky de Ípola: Ciro y Los Persas✅, La Franela✅, Los Piojos✅
+Ciro Fogliatta: Dulces 16✅, Espíritu✅, Los Gatos✅, Nito Mestre y Los Desconocidos de Siempre✅, Polifemo✅, Sacramento✅
+Claudio Cardaci: Almafuerte✅, Beso Negro✅
+Claudio Gabis: Los Abuelos de la Nada✅, Billy Bond y La Pesada del Rock and Roll✅, Manal✅
+Claudio O'Connor: Hermética✅, Malón✅
+Claudio Marciello, Almafuerte✅, El Reloj✅
+Daniel Binelli: Alas✅, Generación Cero✅
+Daniel Colombres: Suéter✅, Raíces✅
+Daniel Melingo: Los Abuelos de la Nada✅, Comida China✅, Los Twist✅
+Daniel Sbarra: Miguel Abuelo & Nada✅, Virus✅
+David Lebón: Billy Bond y La Pesada del Rock and Roll✅, Color Humano✅, Espíritu✅, Lila✅, Pappo's Blues✅, Pescado Rabioso✅, Polifemo✅, Serú Girán✅
+Diego Rapoport: Spinetta Jade✅, Raíces✅
+Edelmiro Molinari: Almendra✅, Color Humano✅
+Eduardo Frezza: Engranaje✅, El Reloj✅
+Emilio Del Guercio: Almendra✅, Aquelarre✅
+Enrique Masllorens: La vieja Guardia✅, Cuero✅
+Enrique "Quique" Alvarado: Gorrión✅, Los Mentales✅, Fé✅
+Ernesto Romeo: Espíritu✅, Pez✅
+Fabián Quinteiro: Comida China✅, Virus✅, Ratones Paranoicos✅
+Fabiana Cantilo: Los Twist✅, Comida China✅
+Félix Pando: La Joven Guardia✅, Gorrión✅
+Fernando Lupano: Miguel Mateos ZAS✅, La Torre✅
+Fernando Ricciardi: Los Fabulosos Cadillacs✅, Cienfuegos✅, El Siempreterno✅
+Fracisco Pratti: Sui Generis✅, Nito Mestre y Los Desconocidos de Siempre✅
+Gabriel Guerrisi: Juana la Loca✅, Babasónicos✅, Los Brujos✅
+Gabriel Jolivet: Patricio Rey y Sus Redonditos de Ricota✅, Pappo's Blues✅, Dulces 16✅
+Gabriel Manelli: Los Brujos✅, Juana la Loca✅, Babasónicos✅
+Gady Pampillón: La Torre✅, Alakrán✅
+Germán Daffunchio: Las Pelotas✅, Sumo✅
+Gonzalo Palacios: Patricio Rey y Sus Redonditos de Ricota✅, Los Twist✅, Fricción✅
+Guillermo Vadalá: Enanitos Verdes✅, Madre Atómica✅
+Gustavo Bazterrica: La Máquina de Hacer Pájaros✅, Los Abuelos de la Nada✅
+Gustavo Cerati: Fricción✅, Soda Stereo✅
+Gustavo Fedel: Espíritu✅, Generación Cero✅
+Gustavo Kupinski: Los Piojos✅, Las Pelotas✅
+Gustavo Liamgot: Los Fabulosos Cadillacs, Raíces
+Gustavo Moretto: Alas✅, Alma y Vida✅
+Gustavo Rowek: V8✅, Rata Blanca✅
+Gustavo Santaolalla: Soluna✅, Arco Iris✅
+Héctor Pomo Lorenzo: Los Abuelos de la Nada✅, Pappo's Blues✅, Invisible✅, Spinetta Jade✅
+Héctor Starc: Aquelarre✅, El 60✅, Tantor✅
+Hernan Espejo: Pez✅, El Siempreterno✅
+Hiacho Lezica: La Joven Guardia✅, Gorrión✅
+Horacio "Droppy" Gianello: Engranaje✅, Ávatar✅, Arco Iris✅, Soluna✅
+Ignacio Smilari: Piel de Pueblo✅, Billy Bond y La Pesada del Rock and Roll✅, La Barra de Chocolate✅, Cuero✅
+Indio Solari: Los Fundamentalistas del Aire Acondicionado✅, Patricio Rey y Sus Redonditos de Ricota✅
+Javier Martínez: Los Beatniks✅, Billy Bond y La Pesada del Rock and Roll✅
+Joaquín Levinton: Juana la Loca✅, Turf✅
+Jorge Araujo: Divididos✅, Gran Martell✅
+Jorge Minissale: Suéter✅, Trigémino✅, Los Twist✅
+Jorge Pinchevsky: La Cofradía de la Flor Solar✅, Billy Bond y La Pesada del Rock and Roll✅
+José Luis Fernández: La Máquina de Hacer Pájaros✅, Crucis✅
+Jota Morelli: La Torre✅, Madre Atómica✅, Enanitos Verdes✅
+Juan del Barrio: Spinetta Jade✅, Suéter✅, Los Abuelos de la Nada✅
+Juan Espósito: Pappo y Hoy No Es Hoy✅, Boxer✅, Almafuerte✅, El Reloj✅
+Juan García Haymes: Riff✅, Los Criss Cross✅, El 60✅
+Juan José Mosalini: Generación Cero✅, Lágrima✅
+Juan "Pollo" Raffo: Redd✅, Trigémino✅
+Juan Rodríguez: Los Mentales✅, Billy Bond y La Pesada del Rock and Roll✅, Sui Generis✅, Polifemo✅, Pappo's Blues✅
+Kubero Díaz: Los Abuelos de la Nada✅, Billy Bond y La Pesada del Rock and Roll✅, La Cofradía De La Flor Solar✅
+Leo Sujatovich: Nito Mestre y Los Desconocidos de Siempre✅, Raíces✅, Spinetta Jade✅, Tantor✅
+Litto Nebbia: Los Gatos✅, Huinca✅
+Luis Alberto Spinetta: Almendra✅, Invisible✅, Pescado Rabioso✅, Spinetta Jade✅, Spinetta y los Socios del Desierto✅, Billy Bond y la Pesada del Rock and Roll✅
+Luis Alberto Valenti: El Reloj✅, Destroyer✅
+Luis Robinson: Pappo's Blues✅, La Mississippi✅, Los Robertones✅
+Lulo Isod: Virus✅, Ciro y los Persas✅
+Marcelo Corvalán: A.N.I.M.A.L.✅, Carajo✅
+Marcelo Torres: Tantor✅, Los Fundamentalistas del Aire Acondicionado✅, Spinetta y los Socios del Desierto✅
+Martín Bosa: Ataque 77, Juana la Loca✅, La Franela, Estelares
+Martín Carrizo: A.N.I.M.A.L.✅, Los Fundamentalistas del Aire Acondicionado✅
+María Rosa Yorio: Comida China✅, Nito Mestre y Los Desconocidos de Siempre✅, PorSuiGieco✅
+Miguel Abuelo: Los Abuelos de la Nada✅, Miguel Abuelo & Nada✅
+Miguel Cachorro Lopez: Los Abuelos de la Nada✅, Miguel Mateos ZAS✅
+Miguel Zavaleta, Bubu✅, Comida China✅, Suéter✅
+Mono Fontana: Madre Atómica✅, Nito Mestre y Los Desconocidos de Siempre✅, Spinetta Jade✅
+Nito Mestre: Sui Generis✅, Nito Mestre y Los Desconocidos de Siempre✅, PorSuiGieco✅
+Oscar Amante: Soluna✅, Rayuela
+Oscar Moro: Color Humano✅, Los Gatos✅, Huinca✅, La Máquina de Hacer Pájaros✅, Riff✅, Serú Girán✅
+Osvaldo "Bocón" Frascino: Engranaje✅, Pescado Rabioso✅, Sacramento✅, El Reloj✅
+Osvaldo Caló: Ave Rock✅, Nito Mestre y Los Desconocidos de Siempre✅
+Pablo Guerra: Caballeros de la Quema✅, Los Piojos✅
+Pablo Guyot: Banana✅, Los Criss Cross✅, Final, G.I.T.✅, Miguel Mateos ZAS✅
+Pablo Puntoriero: La Beriso✅, Pez✅
+Pablo Sbaraglia: Los Romeos✅, Los Fundamentalistas del Aire Acondicionado✅
+Pajarito Zaguri: Los Beatniks✅, Piel de Pueblo✅, La Barra de Chocolate
+Pappo: Los Abuelos de la Nada✅, Engranaje✅, Los Gatos✅, Pappo's Blues✅, Riff✅, Pappo y Hoy no es Hoy
+Pedro Aznar: Alas✅, Madre Atómica✅, Serú Girán✅
+Pocho Lapouble: Generación Cero✅, El Trío✅
+Polo Corbella: Los Abuelos de la Nada✅, Bubu✅, Destroyer✅, Los Twist✅
+Ricardo Iorio: Almafuerte✅, Hermética✅, Letal✅, V8✅
+Ricardo Lew: Los Guantes Negros✅, El Trío✅
+Ricardo Mollo: Demo✅, Divididos✅, Hurlingam Reggae Band✅, Sumo✅
+Richard Coleman: Los 7 Delfines, Metrópoli, Fricción✅
+Rinaldo Rafanelli: Alphonso S'entrega✅, Color Humano✅, Comida China✅, Demo✅, Polifemo✅, Los Romeos✅, Sui Generis✅
+Roberto "Polaco" Zelazek: A.N.I.M.A.L.✅, Los Violadores✅
+Rodolfo García: Almendra✅, Aquelarre✅, Tantor✅
+Rubén Biscione: Los Mentales✅, Fé✅
+Rubén Ramírez: Pappo y Hoy no es Hoy✅, Bóxer✅
+Rubén Sadrinas: Bersuit Vergarabat✅, Patricio Rey y sus Redonditos de Ricota✅
+Saúl Blanch: Rata Blanca✅, Plus✅
+Sebastián Peyceré: Los Abuelos de la Nada✅, Dulces 16✅
+Sebastián Schachtel: Las Pelotas✅, La portuaria✅
+Sergio Nacif: Alphonso S'entrega✅, Los Romeos✅
+Sergio Polizzi: Soluna✅, Bubu✅
+Sergio Rotman: Los Fabulosos Cadillacs✅, Cienfuegos✅, El Siempreterno✅
+Skay Beilinson: La Cofradía de la Flor Solar✅, Patricio Rey y Sus Redonditos de Ricota✅
+Tito Fargo: Hurlingham Reggae Band✅, Patricio Rey y Sus Redonditos de Ricota✅, Gran Martell✅
+Tomás Gubitsch: Generación Cero✅, Invisible✅, Lágrima✅
+Vitico: Alta Tensión, Billy Bond y La Pesada del Rock and Roll✅, Los Criss Cross✅, La Joven Guardia✅, Riff✅
+Willy Crook: Los Abuelos de la Nada✅, Comida China✅, Patricio Rey y Sus Redonditos de Ricota✅
+Willy Iturri: Banana✅, Los Criss Cross✅, G.I.T.✅
+Willy Quiroga: Destroyer✅, Vox Dei✅
+
+
+
+#GRUPOS
+
+—— Los Gatos ——
+Litto Nebbia (voz, armonica, guitarra)
+Ciro Fogliatta (teclado)
+Kay Galifi (guitarra)
+Oscar Moro (batería)
+Alfredo Toth (bajo, guitarra)
+Pappo (guitarra)
+
+—— Huinca ——
+Litto Nebbia (vocales, armonica, guitarra)
+Oscar Moro (batería)
+Cacho Lafalce (bajo, voz)
+Gabriel Ranelli (teclado)
+
+—— Dulces 16 ——
+Marcelo Pucci (batería)
+León Vanella (guitarra, voz)
+Ciro Fogliatta
+Gustavo Perez (guitarra, voz)
+Rudy Marcolongo (guitarra)
+Luis Vargas (guitarra)
+Gabriel Jolivet (guitarra)
+Néstor Vetere (bajo)
+Sebastián Peyceré (batería)
+Guillermo Zorro Salinas (batería)
+
+—— Espíritu ——
+Osvaldo Favrot (guitarra, teclado, voz)
+Fernando Bergé (voz) 
+Carlos Goler (batería)
+Claudio Martínez (bajo)
+David Lebón (teclado)
+Gustavo Fedel (teclado)
+Ciro Fogliatta (teclado)
+Rodolfo Messina (batería)
+Claudio Cicerchia (bajo)
+Ángel Mahler (teclado)
+Ernesto Romeo (teclado, órgano, piano)
+Horacio Ardiles (batería) 
+Federico Favrot (bajo) 
+Pablo Guglielmino (voz, guitarra)
+
+—— Nito Mestre y Los Desconocidos de Siempre ——
+Nito Mestre (voz, flauta, guitarra)
+Alfredo Toth (bajo, guitarra, voz)
+Osvaldo Caló (teclado)
+Alejandro Lerner (teclado)
+Edu Zvetelman (teclado)
+Francisco Pratti (batería)
+Leo Sujatovich (teclado)
+María Rosa Yorio (voz)
+Rodolfo Gorosito (guitarra)
+Ciro Fogliatta (teclado)
+Mono Fontana (batería)
+
+—— Polifemo ——
+David Lebón (guitarra, voz)
+Rinaldo Rafanelli (bajo, teclado, voz)
+Juan Rodríguez (batería)
+Ciro Fogliatta (teclado)
+
+—— Sacramento ——
+Alfredo Toth (guitarra, voz)
+Ciro Fogliatta (teclado)
+Ricardo Jelicie (bajo, voz)
+Roberto Lopez (batería)
+Osvaldo Frascino (guitarra)
+
+—— Color Humano ——
+Edelmiro Molinari (guitarra, voz)
+David Lebón (batería, voz)
+Rinaldo Rafanelli (bajo, voz)
+Oscar Moro (batería)
+
+—— La Máquina de Hacer Pájaros ——
+Charly García (teclado, guitarra, voz)
+Carlos Cutaia (teclado)
+Oscar Moro (batería)
+Gustavo Bazterrica (guitarra, voz)
+José Luis Fernández (bajo)
+
+—— Riff ——
+Pappo (guitarra, voz)
+Vitico (bajo, voz)
+Juan García Haymes (voz)
+Boff (guitarra)
+Michel Peyronel (batería, voz)
+Danny Peyronel (teclado)
+Juan Antonio Ferreira (voz, guitarra)
+Oscar Moro (batería)
+Nicolás Bereciartúa (guitarra)
+
+—— Serú Girán ——
+Charly García (teclado, guitarra, bajo, voz)
+David Lebón (guitarra, bajo, voz)
+Pedro Aznar (bajo, teclado, guitarra, voz)
+Oscar Moro (batería)
+
+—— Los Criss Cross ——
+Vitico (bajo, vocales)
+Juan García Haymes (voz)
+Pablo Guyot (guitarra)
+Willy Iturri (batería)
+Alfredo Toth (guitarra)
+Emilio Kauderer (teclado)
+
+—— G.I.T. ——
+Alfredo Toth (bajo, guitarra, voz)
+Pablo Guyot (guitarra)
+Willy Iturri (batería, voz)
+
+
+—— Los Abuelos de la Nada ——
+Miguel Abuelo (voz)
+Héctor Pomo Lorenzo (Batería)
+Micky Lara (guitarra)
+Alberto Lara (bajo)
+Claudio Gabis (guitarra)
+Eduardo Fanacoa (teclado)
+Pappo (guitarra, vocales)
+Cachorro López (bajo)
+Andrés Calamaro (voz, teclado)
+Daniel Melingo (saxo)
+Gustavo Bazterrica (guitarra)
+Polo Corbella (batería)
+Alfredo Desiata (saxo)
+Gringui Herrera (guitarra)
+Kubero Díaz (guitarra)
+Juan del Barrio (teclado)
+Marcelo Fogo (bajo, voz)
+Willy Crook (saxo)
+Claudio Loza (batería)
+Jorge Polanuer (saxo)
+Gato Azul Peralta (voz)
+Alberto Perrone (bajo)
+Sebastián Peyceré (batería)
+
+—— Engranaje ——
+Osvaldo Frascino (guitarra, bajo)
+Pappo (guitarra)
+Horacio Gianello (batería)
+Tito La Rosa (guitarra, voz)
+Black Amaya (batería)
+Ricardo Jelicie (bajo)
+Daniel Molinari (batería)
+Marcelo Roascio (guitarra)
+Sergio D'Ambrosio (teclado)
+Jorge Somoza (bajo, voz)
+Cacho D'Arias (batería)
+Pancho (bajo)
+Alejandro Amaro (bajo, voz)
+Charlie Méndez (batería)
+Dag (bajo)
+Eduardo Frezza (voz)
+Adrián Domanski (bajo)
+
+—— Pappo's Blues ——
+Pappo (guitarra, voz)
+Black Amaya (batería)
+David Lebón (bajo, guitarra)
+Héctor Pomo Lorenzo (batería)
+Carlos Machi Rufino (bajo)
+Alejandro Medina (bajo)
+Eduardo Garbagnatti (batería)
+Eduardo Beaudoux (bajo)
+Dario Fernández (batería)
+Luis Robinson (armónica)
+Machy Madco (bajo)
+
+—— Patricio Rey y Sus Redonditos de Ricota ——
+Indio Solari (voz)
+Skay Beilinson (guitarra)
+Guillermo Beilinson (voz) 
+Ricky Rodrigo (violin, guitarra)
+Basilio Rodrigo (guitarra)
+Beto Verne (guitarra)
+Bernardo Rubaja (teclado)
+Pepe Fenton (bajo)
+Ricardo Meyer (guitarra)
+Gabriel Jolivet (guitarra)
+León Vanella (guitarra) 
+Daniel D'Aloisio (bajo)
+Diego Rodriguez (batería)
+Laura Hutton (coros)
+Alejandro Pensa (batería)
+Gonzalo Palacios (saxo)
+Semilla Bucciarelli (bajo)
+Piojo Ábalos (batería)
+Willy Crook (saxo)
+Tito Fargo (guitarra)
+Walter Sidotti (batería)
+Sergio Dawi (saxophone, teclado, armonica)
+Hernán Aramberri (batería)
+Rubén Sadrinas (voz secundaria)
+
+—— Billy Bond y La Pesada del Rock and Roll ——
+Billy Bond (voz)
+Kubero Díaz (guitarra)
+Luis Alberto Spinetta (voz, guitarra)
+Alejandro Medina (bajo)
+Javier Martínez (batería)
+Jorge Pinchevsky (violín)
+Pappo (guitarra)
+Poli Martínez (guitarra)
+Black Amaya (batería)
+David Lebón (bajo, guitarra)
+Claudio Gabis (guitarra)
+Vitico (bajo)
+Jimmy Márquez (batería)
+Héctor Pomo Lorenzo (batería)
+Luis Gambolini (batería)
+Cacho Lafalce (bajo)
+Ignacio Smilari (guitarra)
+
+—— Lila ——
+David Lebón (bajo, batería, guitarra, voz)
+Carlos Cutaia (teclado)
+Daniel Fernández (guitarra, saxo)
+Jorge Seleson (violín)
+Carola (voz)
+
+—— Pescado Rabioso ——
+Luis Alberto Spinetta (guitarra, voz)
+Black Amaya (batería)
+Osvaldo Frascino (bajo, guitarra, voz)
+Carlos Cutaia (teclado)
+David Lebón (bajo, guitarra, voz)
+
+—— Generación Cero ——
+Rodolfo Mederos (bandoneón)
+Daniel Binelli (bandoneón)
+Juan José Mosalini (bandoneón)
+Arturo Schneider (saxo)
+Ricardo Salas (bajo) 
+Jorge Lapouble (batería)
+Tomás Gubitsch (guitarra)
+Gustavo Fedel (Teclado)
+Eduardo Criscuolo (bajo) 
+Rodolfo Messina (batería)
+
+—— Pez ——
+Ariel Minimal (guitarra, voz)
+Poli Barbieri (batería)
+Alez Barbieri (bajo)
+Franco Salvador (batería, voz)
+Iris Auteri (bajo)
+Fósforo García (bajo, voz)
+Pablo Puntoriero (saxo, flauta)
+Juan Salese (teclado)
+Leopoldo Limeres (piano)
+Ernesto Romeo (teclado)
+Juan Ravioli (piano, guitarra, voz)
+Hernán Espejo (guitarra)
+
+—— Sui Generis ——
+Charly García (teclado, voz)
+Nito Mestre (voz, guitarra, flauta)
+Alberto Rodríguez (batería)
+Alejandro Correa (bajo)
+Rolando Fortich (bajo)
+Juan Carlos Bellia (guitarra)
+Carlos Piégari (guitarra, voz)
+Rinaldo Rafanelli (bajo)
+Juan Rodríguez (batería)
+
+—— PorSuiGieco ——
+Charly García (teclado, voz)
+Nito Mestre (guitarra, fluata, voz)
+Leon Gieco (guitarra, armonica, voz)
+Raul Porchetto (guitarra, voz)
+María Rosa Yorio (voz)
+
+—— Ave Rock ——
+Héctor Antogna (batería)
+Federico Sainz (vocales)
+Luis Borda (guitarra, vocales)
+Oscar Glavic (bajo, vocales)
+Osvaldo Caló (teclado)
+Marcelo Sabarido (batería)
+Francisco Arregui (guitarra, vocales)
+Jorge Liechtenstein (batería)
+Alberto Salamone (teclado)
+Hector Ruiz (batería)
+
+—— Soluna ——
+Gustavo Santaolalla (voz, guitarra, armonica)
+Alejandro Lerner (teclado)
+Monica Campins (voz, teclado)
+Oscar Amante (guitarra, charango, voz)
+Sergio Polizzi (violín)
+Ricky Libman (bajo)
+Horacio Gianello (batería)
+
+—— Raíces ——
+Beto Satragni (bajo, voz)
+Roberto Valencia (teclado)
+Andrés Calamaro (teclado)
+Alberto Bengolea (guitarra)
+Jimmy Santos (percusión)
+Raúl Cuadro (batería)
+Leo Sujatovich (teclado)
+Martín Ordúñez (teclado)
+Juan Carlos Tordó (batería)
+Quique Sinesi (guitarra)
+Nora Sarmonía (teclado)
+Gustavo Liamgot (piano)
+Daniel Colombres (batería)
+Diego Rapoport (teclado)
+
+—— Spinetta Jade ——
+Luis Alberto Spinetta (voz, guitarra)
+Héctor Pomo Lorenzo (batería)
+Beto Satragni (bajo)
+Diego Rapoport (teclado)
+Juan del Barrio (teclado)
+Frank Ojstersek (bajo)
+César Franov (bajo) 
+Paul Dourge (bajo)
+Leo Sujatovich (teclado)
+Mono Fontana (teclado)
+Lito Epumer (guitarra)
+
+—— Tantor ——
+Héctor Starc (guitarra)
+Rodolfo García (batería)
+Carlos Machi Rufino (bajo)
+Babú Cerviño (teclado)
+Marcelo Torres (bajo)
+Leo Sujatovich (teclado)
+
+—— Comida China ——
+Rafael Bini (guitarra, teclado, voz)
+Fabián Quintiero (teclado)
+Rinaldo Rafanelli (bajo)
+Camilo Iezzi (bajo)
+Fernando Cartier (batería)
+Andrés Calamaro (teclado, voz)
+Daniel Melingo (saxo)
+Willy Crook (saxo)
+Fabiana Cantilo (voz)
+Hilda Lizarazu (voz)
+Miguel Zavaleta (guitarra)
+María Rosa Yorio (voz)
+
+—— Madre Atómica ——
+Lito Epumer (guitarra, voz)
+Mono Fontana (batería, teclado)
+Rubén Darío Alcaraz (bajo)
+Pedro Aznar (bajo)
+César Franov (bajo)
+Jota Morelli (batería)
+Guillermo Vadalá (bajo)
+
+—— Alphonso S'entrega ——
+Aníbal García (batería)
+Daniel Morano (guitarra, voz)
+Marcelo Pelater (saxo)
+Rinaldo Rafanelli (bajo)
+Sergio Nacif (guitarra, voz)
+Daniel Castro (bajo)
+
+—— Demo ——
+Rinaldo Rafanelli (bajo, voz)
+Ricardo Mollo (guitarra, voz)
+Daniel Leis (guitarra, voz)
+Berto Topini (batería)
+
+—— Los Romeos ——
+Sergio Nacif (guitarra, voz)
+Gustavo Virgilio (batería)
+Pablo Sbaraglia (teclado, voz)
+Marcelo Pelater (saxo)
+Clea Torres (saxo)
+Claudio Batista (bajo)
+Emma Heslop (teclado, voz)
+Carlos Gardellini (guitarra, voz)
+Omar Pérez (bajo)
+
+—— Los Mentales ——
+Daniel Irigoyen (voz)
+Ruben Biscione (guitarra)
+Quique Alvarado (órgano)
+Walter Fermín (bajo)
+Juan Rodríguez (batería)
+
+—— Almendra ——
+Luis Alberto Spinetta (guitarra, voz)
+Edelmiro Molinari (guitarra, voz)
+Emilio Del Guercio (bajo, voz, flauta)
+Rodolfo García (batería, voz)
+
+—— Crucis ——
+Gustavo Montesano (bajo, guitarra, vocales)
+José Luis Fernández (bajo)
+Daniel Frenkel (batería)
+Daniel Oil (teclado)
+Pino Marrone (guitarra, vocales)
+Gonzalo Farrugia (batería)
+Anibal Kerpel (teclado)
+
+—— Alta Tensión ——
+Alejandra Aldao (voz)
+Vitico (bajo)
+Héctor Starc (guitarra)
+Richard Mochulske (guitarra, voz)
+
+—— La Joven Guardia ——
+Hiacho Lezica (batería)
+Enrique Masllorens (bajo)
+Roque Narvaja (guitarra, voz)
+Félix Pando (teclado, voz)
+Vitico (Miembro)
+
+—— Pappo y Hoy No Es Hoy ——
+Pappo (guitarra, voz)
+Boff (guitarra)
+Rubén Ramírez (bajo)
+Juan Espósito (batería)
+
+—— Boxer ——
+Boff (voz) 
+Enrique Avellaneda (guitarra)
+Juan Espósito (batería)
+Rubén Ramírez (bajo)
+
+—— Almafuerte ——
+Ricardo Iorio (vocales, bajo)
+Claudio Marciello (guitarra)
+Claudio Cardaci (batería)
+Rodolfo Márquez (batería)
+Walter Martínez (batería)
+Bin Valencia (batería)
+Beto Ceriotti (bajo)
+Juan Espósito (batería)
+Guillermo Araya (bajo) 
+
+—— El Reloj ——
+Willy Gardi (guitarra)
+Osvaldo Zabala (guitarra)
+Juan Espósito (batería, voz)
+Eduardo Frezza (bajo, voz)
+Luis Alberto Valenti (teclado, voz)
+Jorge Gomez (bajo)
+Jorge Martinez (voz, guitarra)
+Claudio Marciello (guitarra)
+
+—— Alas ——
+Alex Zucker (bajo, guitarra)
+Carlos Riganti (batería)
+Gustavo Moretto (teclado, trompeta, voz)
+Daniel Binelli (bandoneón)
+Pedro Aznar (bajo)
+
+—— Banana ——
+César "Banana" Pueyrredón (vocales, teclado)
+Toro Martínez (batería)
+Jorge Scoufalos (guitarra, vocales)
+Daniel Pueyrredón (guitarra, vocales) 
+Alejandro Giordano (bajo)
+Miguel Green (batería)
+Willy Iturri (batería)
+Pablo Guyot (guitarra)
+Fori Mattaldi (bajo)
+José Luis Meniño (batería)
+Diego Chornogubsky (bajo)
+Rody Correa Ávila (guitara)
+Juan Gelly Cantilo (guitarra)
+
+—— Miguel Mateos ZAS ——
+Miguel Mateos (voz y teclados)
+Alejandro Mateos (batería)
+Fernando Lupano (bajo)
+Ricardo Pegnotti (guitarra y coros)
+Pablo Guyot (guitarra)
+Raúl Chevalier (bajo y coros)
+Eduardo Sanz (guitarras y coros)
+Julio Lala (teclados y coros)
+Oscar Kreimer (saxofón)
+Miguel Cachorro López (bajo)
+Carlos García López (guitarra)
+Ulises Butrón (guitarra)
+Jorge Infusino (bajo)
+Omar Moretti (guitarra)
+
+—— Miguel Abuelo & Nada ——
+Miguel Abuelo (guitarra, voz)
+Carlos Beyris (voz)
+Pinfo Garrigo (voz)
+Daniel Sbarra (guitarra, voz)
+Diego Rodriguez (batería)
+
+
+—— Invisible ——
+Luis Alberto Spinetta (guitarra, voz) 
+Carlos Machi Rufino (bajo)
+Héctor Pomo Lorenzo (batería) 
+Tomás Gubitsch (guitarra)
+
+—— Manal ——
+Alejandro Medina (bajo, voz)
+Claudio Gabis (guitarra)
+Javier Martínez (batería, voz)
+
+
+—— Trigémino ——
+Juan "Pollo" Raffo (teclado, voz)
+Jorge Minissale (guitarra, voz)
+Marco Tulio Pusineri (batería, voz)
+Eduardo Rovediello (bajo)
+Claudia Puyó (voz) 
+Carlos Garófalo (voz, bajo, teclado, guitarra)
+Andrés Calamaro (teclado)
+Esteban Cerioni (bajo, voz)
+Héctor "Cote" Conrado (voz)
+
+—— Los Twist ——
+Pipo Cipolatti (guitarra, voz)
+Daniel Melingo (guitarra, saxo, voz)
+Damián Toppino (instrumentos de viento) 
+Fabiana Cantilo (voz)
+Gonzalo Palacios (saxo)
+Polo Corbella (batería)
+Eduardo Cano (bajo)
+Pablo Guadalupe (batería)
+Hilda Lizarazu (voz)
+Camilo Iezzi (bajo)
+Tito Losavio (guitarra)
+Thelma Vidal (voz) 
+Beba Vidal (voz) 
+Jorge Minissale (guitarra)
+Damián Nisenson (saxo) 
+Rolo Rossini (batería)
+Fabián Piacquadio (batería)
+Fercho Diaco (saxo)
+
+—— Bubu ——
+Sergio Polizzi (violín)
+Cecilia Tenconi (flauta)
+Wim Fortsman (saxo, voz)
+Petty Guelache (voz)
+Eduardo Rogatti (guitarra)
+Eduardo "Fleke" Folino (bajo)
+Polo Corbella (batería)
+Miguel Zavaleta (guitarra, voz)
+
+—— Destroyer ——
+Willy Quiroga (bajo, voz, piano)
+Polo Corbella (batería)
+Luis Alberto Valenti (teclado) 
+Beto Topini (batería)
+
+—— La Cofradía de la Flor Solar ——
+Gustavo Meli (batería)
+Sebastián Rivas (guitarra, voz)
+Morcy Requena (bajo, voz)
+Skay Beilinson (guitarra)
+Kubero Díaz (guitarra)
+Jorge Pinchevsky (violín)
+
+—— Suéter ——
+Juan del Barrio (teclado)
+Gustavo Donés (bajo)
+Miguel Zavaleta (teclado, voz)
+Daniel Colombres (batería)
+Eduardo Rogatti (guitarra)
+Jorge Minissale (guitarra)
+Claudio Loza (batería)
+Alejandro Desilvestre (teclado)
+José Luis Asaresi (guitarra)
+Claudio Venier (batería)
+Silvio Furmanski (guitara)
+Diego Chorno (guitarra)
+
+—— Avatar ——
+Carlos Piégari (teclado, guitarra, voz)
+Horacio "Droppy" Gianello (batería)
+Edgardo Fernández (bajo)
+Adolfo Martínez (voz guitarra)
+Daniel Mele (batería)
+Beatriz Sanchez (voz)
+Rafael Morelli (instrumentos de viento)
+
+—— Arco Iris ——
+Gustavo Santaolalla (guitarra, voz) ----
+Ara Tokatlián (instrumentos de viento, teclado, voz) ----
+Guillermo Bordarampe (bajo) ----
+Alberto Cascino (batería) ----
+Horacio "Droppy" Gianello (batería)
+
+—— Los Robertones ——
+Black Amaya (Batería)
+Josué Marchi (guitarra, voz)
+Luca Frasca (teclado)
+Luis Robinson (armonica)
+Machy Madco (bajo)
+Daniel "Yalo" Lopez (bajo)
+Fabio Magno (guitarra)
+Sebastián Casaccio (bajo)
+Fabián Vimini (voz)
+
+—— Los Fundamentalistas del Aire Acondicionado ——
+Indio Solari (voz)
+Baltasar Comotto (guitarra)
+Pablo Sbaraglia (teclado
+Deborah Dixon (voz)
+Julio Sáez (guitarra)
+Ervin Stutz (trompeta)
+Alejandro Von der Pahlen (saxo)
+Hernán Aramberri (batería)
+Marcelo Torres (bajo)
+Gaspar Benegas (guitarra)
+Martín Carrizo (batería)
+Sergio Colombo (saxo) 
+Miguel Ángel Tallarita (trompeta)
+Luciana Palacios (voz)
+Carlos Nozzi (violín)
+Alejandro Elijovich (violín)
+Emanuel Sáez (guitarra, voz)
+xel Lang (teclado, sampler)
+Fernando Nalé (bajo)
+Ramiro López Naguil (batería)
+
+—— Fricción ——
+Richard Coleman (guitarra, voz)
+Gustavo Cerati (guitarra)
+Gonzalo Palacios (saxo)
+Celsa Mel Gowland (voz)
+Christian Basso (bajo)
+Fernando Samalea (batería)
+Daniel Castro (bajo)
+Rolando Ureta (guitarra)
+Daniel Ávila (batería)
+
+—— Hurlingham Reggae Band ——
+Luca Prodan (voz)
+Diego Arnedo (bajo)
+Ricardo Mollo (guitarra)
+Tito Fargo (guitarra)
+Alberto Troglio (batería)
+Roberto Pettinato (saxo)
+
+—— Gran Martell ——
+Jorge Araujo (batería, voz)
+Tito Fargo (guitarra, voz)
+Gustavo Jamardo (bajo, voz)
+
+—— Bersuit Vergarabat ——
+Pepe Céspedes (bajo, voz)
+Juan Subirá (teclado)
+Carlos Martín (batería)
+Gustavo Cordera (voz)
+Miguel Jara (bajo)
+Carlos Bianco (guitarra)
+Rubén Sadrinas (voz)
+Oscar Righi (guitarra)
+Marcela Chediak (percusión)
+Raúl Pagano (teclado)
+Alberto Verenzuela (guitarra)
+Héctor García (voz)
+Daniel Suárez (voz)
+Germán Sbarbati (voz) 
+Manuel Uriona (percusión)
+Nano Campoliete (guitarra) 
+Juan Bruno (guitarra) 
+
+—— Los Guantes Negros ——
+Billy Bond (guitarra, voz)
+Guillermo Verdaguer (bajo, voz)
+Ricardo Lew (guitarra, voz)
+Alberto Hualde (batería)
+Néstor Rama (órgano)
+Gamba Gentilini (guitarra) 
+Miguel Fender (bajo)
+Alberto Renato Meana (batería)
+
+—— Spinetta y los Socios del Desierto ——
+Luis Alberto Spinetta (guitarra, voz)
+Marcelo Torres (bajo)
+Daniel Wirtz (batería)
+
+—— Los Beatniks ——
+Moris (guitarra, voz)
+Pajarito Zaguri (guitarra, voz)
+Javier Martínez (batería)
+Jorge Navarro (teclado)
+Antonio Pérez Estévez (bajo)
+
+—— Lágrima ——
+Guillermo Reuter (bajo)
+Chango Farías Gómez (voz, percusión)
+Juan José Mosalini (bandoneón)
+Tomás Gubitsch (guitarra)
+Enzo Gieco (flauta, saxo)
+Gustavo Beytelmann (piano, sintetizador)
+Sergio Arriagada (percusión)
+
+—— El Trío ——
+Pocho Lapouble (batería, piano)
+Ricardo Lew (guitarra)
+Adalberto Cevasco (bajo, piano)
+
+—— Los Fabulosos Cadillacs ——
+Vicentico (voz)
+Flavio Cianciarullo (bajo)
+Fernando Ricciardi (batería)
+Serguei (trompeta)
+Luciano Jr (percusión)
+Naco Goldfinger (saxo)
+Aníbal Rigozzi (guitarra)
+Sergio Rotman (saxo)
+Mario Siperman (teclado) 
+Daniel Lozano (trompeta)
+Fernando Albareda (trombón)
+Gerardo Rotblat (percusión)
+Ariel Minimal (guitarra)
+
+—— El Siempreterno ——
+Sergio Rotman (voz, guitarra)
+Midnerély Acevedo (voz)
+Fernando Ricciardi (batería)
+Álvaro Ruso Sánchez (bajo)
+Ariel Minimal (guitarra)
+Hernán Espejo (guitarra)
+
+—— La Beriso ——
+Rolando "Rolo" Sartorio (voz)
+Pablo Ferradas (guitarra, voz)
+Emiliano Mansilla (guitarra)
+Ezequiel Bolli (bajo)
+Javier Pandolfi (batería)
+Conde Kunga (teclado)
+Pablo Puntoriero (saxo)
+
+—— Rayuela ——
+Willie Campins (bajo, voz)
+Andrés Goldstein (guitarra, voz)
+Marcelo Morano (teclado)
+Guillermo Nojechowicz (batería, voz)
+Eduardo Berinstein (saxo, flauta, percusión) 
+Oscar Amante (batería)
+
+—— El 60 ——
+Beto Satragni (bajo)
+Héctor Starc (guitarra)
+Fernando Marrone (batería)
+Juan García Haymes (voz)
+
+—— Grupo Encuentro ——
+Juan Carlos Ingaramo (teclado)
+Mingui Ingaramo (guitarra)
+César "Bebe" Caniza (batería)
+Julián Navarro (teclado, voz) 
+César Franov (bajo)
+Oscar Feldman (saxo)
+Lito Loyola (bajo) 
+Pichón Bustos (saxo)
+
+—— Aquelarre ——
+Héctor Starc (guitarra)
+Rodolfo García (batería)
+Emilio del Guercio (bajo, voz)
+Hugo González Neira (teclado)
+
+—— Enanitos Verdes ——
+Felipe Staiti (guitarra, voz)
+Daniel Piccolo (bateríra)
+Marciano Cantero (voz, bajo)
+Sergio Embroni (guitarra)
+Tito Dávila (teclado)
+Eduardo Lalanne (teclado)
+Horacio Gómez (teclado)
+Jota Morelli (batería)
+Bosco Aguilar (teclado)
+Guillermo Vadalá (bajo)
+
+—— Divididos ——
+Ricardo Mollo (guitarra, voz)
+Diego Arnedo (bajo, voz)
+Gustavo Collado (batería)
+Federico Gil Solá (batería)
+Jorge Araujo (batería)
+Catriel Ciavarella (batería)
+
+—— Sumo ——
+Luca Prodan (voz)
+Germán Daffunchio (guitarra)
+Diego Arnedo (bajo)
+Roberto Pettinato (saxo)
+Ricardo Mollo (guitarra) 
+Alberto "Superman" Troglio (batería)
+Stephanie Nuttal (batería)
+Alejandro Sokol (bajo, batería)
+Ricardo Curtet (guitarra)
+
+—— Fé ——
+Carlos Echeverry (voz)
+Rubén Biscione (guitarra)
+Enrique "Quique" Alvarado (bajo, piano)
+Jorge Cánaves (trompeta)
+Pablo Kusselman (saxo)
+Pablo Hernández (batería)
+
+—— Gorrión ——
+Félix Pando (teclado, voz)
+Hiacho Lezica (batería)
+Enrique "Quique" Alvarado (bajo, piano)
+Daniel Cash (guitarra)
+
+—— Hermética ——
+Ricardo Iorio (bajo, voz)
+Claudio O'Connor (voz)
+Antonio Romano (guitarra)
+Fabián Spataro (batería)  
+Tony Scotto (batería)
+Claudio Strunz (batería)
+
+—— V8 ——
+Ricardo Iorio (bajo, voz)
+Ricardo "Chofa" Moreno (guitarra)
+Gerardo Osemberg (batería)
+Alejandro "Pesadilla" Colantonio (batería)
+Alberto "Beto" Zamarbide (voz)
+Osvaldo Civile (guitarra)
+Gustavo Rowek (batería)
+Miguel Roldán (guitarra)
+Walter Giardino (guitarra)
+Gustavo "Turco" Andino (batería)
+Adrián Cenci (batería)
+
+—— Beso Negro ——
+Lito Pared (voz)
+Andrés Giménez (guitarra)
+Claudio Cardaci (batería)
+Freddy Fernández (bajo)
+Daniel Trobo (teclado)
+
+—— Rata Blanca ——
+Walter Giardino (guitarra)
+Adrián Barilari (voz)
+Guillermo Sánchez (bajo)
+Hugo Bistolfi (teclado)
+Fernando Scarcella (batería)
+Gustavo Rowek (batería)
+Sergio Berdichevsky (guitarra)
+Saúl Blanch (voz)
+Mario Ian (voz)
+Javier Retamozo (teclado)
+Gabriel Marian (voz)
+
+—— Alma y Vida ——
+Alberto Hualde (batería)
+Bernardo Baraj (saxo)
+Carlos Mellino (teclado, voz)
+Carlos Villalba (bajo)
+Juan Barrueco (guitarra)
+Mario Salvador (trompeta) 
+Gustavo Moretto (trompeta, fluata, piano)
+Osvaldo Lacunza (trompeta)
+
+—— Materia Gris ——
+Julio Presas (guitarra, bajo, voz)
+Eduardo Rapetti (guitarra, voz)
+Omar Constanzo (bajo, voz)
+Carlos Cutaia (teclado)
+Carlos Riganti (batería)
+
+—— La Torre ——
+Patricia Sosa (voz)
+Oscar Mediavilla (guitarra)
+Carlos García López (guitarra)
+Gustavo Giles (bajo)
+Ricardo Giles (batería)
+Gady Pampillón (guitarra)
+Luis Muscolo (teclado)
+Jota Morelli (batería)
+
+—— Virus ——
+Julio Moura (guitarra, teclado, voz)
+Marcelo Moura (guitarra, teclado, voz, sintetizador, bajo)
+Ricardo Serra (guitarra)
+Federico Moura (guitarra, teclado, voz)
+Mario Serra (batería)
+Enrique Mugetti (voz, bajo)
+Daniel Sbarra (guitarra, teclado, voz)
+Pablo Mugica (bajo)
+Fabián Quintiero (teclado)
+Patricio Fontana (bajo, guitarra, teclado)
+Aitór (batería)
+Rafael Villazón (teclado)
+Lulo Isod (batería)
+Fernando Monteleone (teclado, sintetizador)
+Ariel Naon (bajo, contrabajo, guitarra, teclado)
+Nicolás Méndez (batería)
+Agustín Ferro (guitarra)
+
+—— Redd ——
+Luis Albornoz (voz, bajo, guitarra)
+Esteban Cerioni (voz, bajo, guitarra, teclado)
+Juan Escalante (voz, batería, teclado)
+Oscar Imhoff (voz)
+Juan "Pollo" Raffo (teclado)
+Marco Tulio Pusineri (batería)
+
+—— Vox Dei ——
+Rubén Basoalto (batería, voz)
+Willy Quiroga (bajo, guitarra, piano, voz)
+Ricardo Soulé (guitarra, piano, armónica, mandolina, violín, voz)
+Juan Carlos Godoy (guitarra, voz)
+Simón Quiroga (batería)
+Carlos Gardellini (guitarra) 
+
+—— La Mississippi ——
+Claudio Cannavo (bajo)
+Gastón Picazo (teclado)
+Gustavo Ginoi (guitarra)
+Juan Carlos Tordó (batería) 
+Ricardo Fabián Tapia (voz, armónica, guitarra)
+Luis Robinson (armónica)
+
+—— A.N.I.M.A.L. ——
+Andrés Giménez (voz, guitarra)
+Roberto "Polaco" Zelazek (bajo)
+Marcelo Corvalán (bajo)
+Aníbal Aló (batería)
+Javier Dorado (batería) 
+Martín Carrizo (batería)
+Andrés "Niño" Vilanova (batería)
+Cristian "Titi" Lapolla (bajo)
+Marcelo Castro (batería) 
+Hernán Cotelo (bajo)
+Claudio Cardacci (batería)
+Fabricio Ravelli (batería)
+
+—— Soda Stereo ——
+Gustavo Cerati (voz, guitarra, sintetizador, teclado)
+Zeta Bosio (bajo, armónica)
+Charly Alberti (batería)
+
+—— La Portuaria ——
+Diego Frenkel (voz, guitarra)
+Sebastián Schachtel (teclado)
+Adi Azicri (guitarra)
+Colo Belmonte (batería) 
+Pablo Giménez (bajo)
+Christian Basso (bajo)
+Axel Krygier (piano, saxo)
+
+—— Las Pelotas ——
+Germán Daffunchio (guitarra, voz)
+Alejandro Sokol (voz, guitarra)
+Alberto Troglio (batería)
+Willy Robles (bajo)
+Tomás Sussmann (guitarra, voz)
+Guido Nisenson (bajo)
+Marcelo Fink (bajo)
+Marcelo Scasso (bajo)
+Benno Guelber (bajo)
+Gabriela Martínez (bajo, voz)
+Gustavo Jove (batería)
+Gillespi (trompeta, teclado)
+Sebastián Schachtel (teclado)
+Gustavo Kupinski (guitarra)
+
+—— Piel de Pueblo ——
+Pajarito Zaguri (voz, guitarra)
+Ignacio Smilari (guitarra)
+Willie Pedemonte (bajo)
+Carlos Calabro (batería)
+
+—— Cuero ——
+Ignacio Smilari (guitarra, voz)
+Enrique Masllorens (bajo, voz)
+Carlos Calabró (batería)
+Bernardo Baraj (saxo, flauta)
+Osvaldo López (batería)
+Adalberto Cevasco (bajo)
+Raúl Parentella (piano)
+Joe Coco (percusión)
+
+—— Cienfuegos ——
+Sergio Rotman (voz)
+Hernán Bazzano (guitarra, voz)
+Diego Aloé (guitarra)
+Martín Aloé (bajo, voz)
+Fernando Ricciardi (batería)
+
+—— Malón ——
+Antonio Romano (guitarra)
+Karlos Cuadrado (bajo)
+Claudio Strunz (batería)
+Claudio O'Connor (voz)
+Eduardo Ezcurra (voz)
+Javier Rubio (batería)
+
+—— Plus ——
+Cacho D'Arías (batería)
+Hugo Racca (bajo, voz)
+Saúl Blanch (voz)
+Julio Sáez (guitarra, voz)
+Leon Vanella (guitarra)
+
+—— Orions ——
+Adrian Bar (guitarra)
+Ronan Bar (bajo, voz)
+Alberto Varak (voz)
+Horacio Várbaro (teclado)
+José Luis González (batería)
+Cacho D'Arias (batería)
+Alejandro Láudano (guitarra)
+
+—— Alakrán ——
+Gady Pampillón (guitarra)
+Mario Ian (voz)
+Walter Curry (guitarra)
+Hernan Gracia (bajo)
+Pablo Naydón (batería)
+Pablo Hortas (teclado)
+Mario Cursio (voz)
+
+—— Ratones Paranoicos ——
+Juanse (voz, guitarra)
+Pablo Memi (bajo)
+Pablo Cano (guitarra)
+Rubén Quiroga (batería)
+Fabián Quintiero (bajo, teclado)
+
+—— Juana la Loca ——
+Aitór 
+Gabriel Guerrisi
+Joaquín Levinton
+Gabriel Manelli
+Martín Bosa
+Carlos Tapia
+
+—— Ciro y los Persas ——
+Andrés Ciro Martínez (voz, guitarra, armónica)
+Juan Manuel Gigena Ábalos (guitarra)
+Broder Bastos (bajo)
+Lulo Isod (batería)
+Juan José Gaspari (guitarra)
+Chucky de Ipola (teclado)
+Rodrigo Pérez (guitarra)
+Diego Mano (teclado)
+Nicolás Raffetta (teclado)
+Martín Löhrengel (teclado)
+
+—— Babasónicos ——
+Adrián Dárgelos (voz) 
+Diego Uma (multi-instrumentalista)
+Mariano Roger (guitarra, voz)
+Diego Tuñón (teclado)
+Diego "Panza" Castellano (batería)
+Gabriel Manelli (bajo)
+Carca (guitarra, bajo)
+Tuta Torres (bajo)
+Gabriel Guerrisi (guitarra)
+
+—— Los Brujos ——
+Gabriel Manelli (bajo)
+Gabriel Guerrisi (guitarra)
+Alejandro Alaci (voz)
+Fabio Pastrello (guitarra)
+Quique Ilid (batería)
+Ricardo Rúa (voz)
+
+—— Turf ——
+Carlos Tapia (bajo, voz)
+Fernando Caloia (batería)
+Joaquín Levinton (voz, guitarra)
+Leandro Lopatín (guitarra)
+Nicolás Ottavianelli (teclado, voz)
+
+—— Ataque 77 ——
+Martín Bosa (teclado)
+Mariano Martínez (guitarra, voz)
+Ciro Pertusi (baso, guitarra, voz) 
+Federico Pertusi (voz)
+Daniel Caffieri Martínez (guitarra)
+Claudio Leiva (batería)
+Leonardo De Cecco (batería)
+Adrian "Chino" Vera (bajo)
+Luciano Scaglione (bajo, voz)
+
+—— La Franela ——
+Martín Bosa (teclado)
+Daniel Piti Fernández (guitarra, voz)
+Diego Chaves (batería)
+Diego Módica (batería)
+Fran Aguilar (guitarra)
+Lucas Rocca (doble bajo)
+Chucky De Ipola (teclado)
+Pablo Ávila (saxo)
+
+—— Estelares ——
+Martín Bosa (teclado)
+Manuel Moretti (voz, guitarra)
+Pablo Silvera (bajo)
+Victor Bertamoni (guitarra)
+Carlos Sánchez (batería)
+Javier Miranda (batería)
+Guillermo Harrington (guitarra)
+Eduardo Minervino (teclado)
+
+—— Los Piojos ——
+Chucky de Ipola (teclado) 
+Andrés Ciro Martínez (voz, guitarra, armónica)
+Miguel Ángel Rodríguez (bajo) ----
+Pablo Guerra (guitarra) ----
+Lisa Di Cione (teclado)
+Martín Staffolani (saxo)
+Daniel Buira (batería) ----
+Piti Fernández (guitarra) ----
+Gustavo Kupinski (guitarra) ----
+Sebastián Cardero (batería)
+Juanchi Bisio (guitarra)
+
+—— Caballeros de la Quema ——
+Alejandro Sorraires (saxo)
+Iván Noble (voz)
+Javier "Nene" Cavo (batería)
+Martín Carro Vila (bajo)
+Martín Mendez (guitarra)
+Martín "Cafusa" Staffolari (saxo)
+Pablo Guerra (guitarra)
+Patricio Castillo (bajo)
+
+—— Carajo ——
+Marcelo Corvalán (bajo, voz)
+Andrés Vilanova (batería)
+Hernán Langer (guitarra)
+
+—— Los Violadores ——
+Pil Trafa (voz)
+Stuka (guitarra)
+Roberto "Polaco" Zelazek (bajo)
+Sergio Gramática (batería)
+Sergio Vall (batería)
+</script>
+<script>
+  // Utilidades de normalización robusta (ignora mayúsculas, tildes, signos y espacios extra)
+  const norm = (s) => s
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[’'".,;:!¡¿?(){}\[\]<>]/g,'')
+    .replace(/&/g,'and')
+    .replace(/\s+/g,' ')
+    .trim();
+
+  // Parseo del TXT incrustado (dejá el <script type="text/plain" id="data-txt"> como ya lo tenés)
+  const rawTxt = document.getElementById('data-txt').textContent;
+
+  function splitSections(txt){
+    const iArt = txt.indexOf('#ARTISTAS');
+    const iGrp = txt.indexOf('#GRUPOS');
+    return {
+      artistas: iArt >= 0 && iGrp > iArt ? txt.slice(iArt + '#ARTISTAS'.length, iGrp).trim() : '',
+      grupos: iGrp >= 0 ? txt.slice(iGrp + '#GRUPOS'.length).trim() : ''
+    };
+  }
+
+  function parseArtistas(artText){
+    const peopleToGroups = new Map();
+    const groupToPeople = new Map();
+    const lines = artText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    for(const line of lines){
+      if(line.startsWith('#')) continue;
+      const idx = line.indexOf(':');
+      if(idx === -1) continue;
+      const person = line.slice(0, idx).trim();
+      const rest = line.slice(idx+1).split(',').map(x=>x.replace(/✅/g,'').trim()).filter(Boolean);
+      const pKey = norm(person);
+      if(!peopleToGroups.has(pKey)) peopleToGroups.set(pKey, {name: person, groups: new Set()});
+      for(let g of rest){
+        g = g.replace(/\s+/g,' ').trim();
+        const gKey = norm(g);
+        if(!groupToPeople.has(gKey)) groupToPeople.set(gKey, {name: g, people: new Set()});
+        peopleToGroups.get(pKey).groups.add(g);
+        groupToPeople.get(gKey).people.add(person);
+      }
+    }
+    return {peopleToGroups, groupToPeople};
+  }
+
+  // NUEVO: mapa de roles por (persona, grupo)
+  const rolesMap = new Map(); // key = norm(person)+'||'+norm(group) -> Set(roles originales)
+  const rolesKey = (person, group) => `${norm(person)}||${norm(group)}`;
+  function addRoles(person, group, rolesArr){
+    const key = rolesKey(person, group);
+    if(!rolesMap.has(key)) rolesMap.set(key, new Set());
+    const set = rolesMap.get(key);
+    for(const r of (rolesArr||[])){
+      const rr = r.trim();
+      if(rr) set.add(rr);
+    }
+  }
+  function getRolesArr(person, group){
+    const set = rolesMap.get(rolesKey(person, group));
+    return set ? Array.from(set) : null;
+  }
+
+  // Diccionario simple para “instrumento → rol”
+  const roleLabel = (raw) => {
+    const m = norm(raw).replace(/^(el|la|los|las)\s+/,'');
+    const map = {
+      'bajo':'bajista',
+      'bajista':'bajista',
+      'guitarra':'guitarrista',
+      'guitarrista':'guitarrista',
+      'bateria':'baterista',
+      'batería':'baterista',
+      'teclado':'tecladista',
+      'teclados':'tecladista',
+      'piano':'pianista',
+      'sintetizador':'tecladista',
+      'saxo':'saxofonista',
+      'saxofon':'saxofonista',
+      'saxofón':'saxofonista',
+      'violin':'violinista',
+      'violín':'violinista',
+      'armonica':'armonicista',
+      'armónica':'armonicista',
+      'percusion':'percusionista',
+      'percusión':'percusionista',
+      'trompeta':'trompetista',
+      'trombon':'trombonista',
+      'trombón':'trombonista',
+      'bandoneon':'bandoneonista',
+      'bandoneón':'bandoneonista',
+      'flauta':'flautista',
+      'voz':'voz',
+      'vocal':'voz',
+      'vocales':'voz',
+    };
+    return map[m] || raw.trim();
+  };
+  const niceJoin = (arr)=>{
+    if(!arr || arr.length===0) return '';
+    if(arr.length===1) return arr[0];
+    return arr.slice(0,-1).join(', ') + ' y ' + arr[arr.length-1];
+  };
+  function formatRoles(roles){
+    if(!roles || roles.length===0) return null;
+    // mapear y capitalizar
+    const mapped = roles.map(r=>{
+      const lbl = roleLabel(r);
+      return lbl.charAt(0).toUpperCase() + lbl.slice(1);
+    });
+    // deduplicar case-insensitive
+    const seen = new Set(), out = [];
+    for(const r of mapped){
+      const k = norm(r);
+      if(!seen.has(k)){ seen.add(k); out.push(r); }
+    }
+    return niceJoin(out);
+  }
+
+  function parseGrupos(grpText, existingMaps){
+    const {peopleToGroups, groupToPeople} = existingMaps;
+    const lines = grpText.split(/\r?\n/);
+    const headerRE = /^—+\s*(.+?)\s*—+$/u; // líneas "—— Nombre ——"
+    let currentGroup = null;
+
+    for(let raw of lines){
+      const line = raw.trim();
+      if(!line) continue;
+      const m = line.match(headerRE);
+      if(m){
+        currentGroup = m[1].trim();
+        const gKey = norm(currentGroup);
+        if(!groupToPeople.has(gKey)) groupToPeople.set(gKey, {name: currentGroup, people: new Set()});
+        continue;
+      }
+      if(!currentGroup) continue;
+
+      // EXTRA: capturar todos los paréntesis como roles
+      const parens = Array.from(line.matchAll(/\(([^)]*)\)/g)).map(mm => mm[1]);
+      let roles = [];
+      for(const p of parens){
+        roles.push(...p.split(/[,/;]| y /i));
+      }
+      roles = roles.map(r=>r.trim()).filter(Boolean);
+
+      // Nombre limpio sin paréntesis ni “----”
+      let person = line.replace(/\(.*?\)/g, '').replace(/----+$/,'').trim();
+      if(!person) continue;
+
+      // completar mapas
+      const pKey = norm(person);
+      const gKey = norm(currentGroup);
+      if(!peopleToGroups.has(pKey)) peopleToGroups.set(pKey, {name: person, groups: new Set()});
+      peopleToGroups.get(pKey).groups.add(currentGroup);
+
+      if(!groupToPeople.has(gKey)) groupToPeople.set(gKey, {name: currentGroup, people: new Set()});
+      groupToPeople.get(gKey).people.add(person);
+
+      // NUEVO: guardar roles por (persona, grupo)
+      if(roles.length) addRoles(person, currentGroup, roles);
+    }
+    return {peopleToGroups, groupToPeople};
+  }
+
+  const sections = splitSections(rawTxt);
+  const maps1 = parseArtistas(sections.artistas);
+  const maps = parseGrupos(sections.grupos, maps1);
+
+  // Listado de grupos para autocompletar
+  const allGroupsSet = new Map(); // normName -> displayName
+  for(const [gKey, gObj] of maps.groupToPeople.entries()){
+    if(!allGroupsSet.has(gKey) || gObj.name.length > allGroupsSet.get(gKey).length){
+      allGroupsSet.set(gKey, gObj.name);
+    }
+  }
+  const allGroups = Array.from(allGroupsSet.values()).sort((a,b)=>a.localeCompare(b,'es'));
+
+  // Poblar datalist
+  const dl = document.getElementById('bandas');
+  for(const g of allGroups){
+    const opt = document.createElement('option');
+    opt.value = g;
+    dl.appendChild(opt);
+  }
+
+  // Grafo bipartito (group <-> person)
+  function buildNeighbors(){
+    const neigh = new Map();
+    const addEdge = (a,b)=>{
+      if(!neigh.has(a)) neigh.set(a, new Set());
+      neigh.get(a).add(b);
+    };
+    for(const [gKey, gObj] of maps.groupToPeople.entries()){
+      const gNode = 'g:' + gObj.name;
+      for(const person of gObj.people){
+        const pNode = 'p:' + person;
+        addEdge(gNode, pNode);
+        addEdge(pNode, gNode);
+      }
+    }
+    // conexiones #ARTISTAS para completar
+    for(const [pKey, pObj] of maps.peopleToGroups.entries()){
+      const pNode = 'p:' + pObj.name;
+      for(const g of pObj.groups){
+        const gNode = 'g:' + g;
+        addEdge(pNode, gNode);
+        addEdge(gNode, pNode);
+      }
+    }
+    return neigh;
+  }
+  const neighbors = buildNeighbors();
+
+  function bfsGroupToGroup(startGroupName, targetGroupName){
+    const startNode = 'g:' + startGroupName;
+    const targetNode = 'g:' + targetGroupName;
+    if(startNode === targetNode) return [startNode];
+
+    const q = [startNode];
+    const seen = new Set([startNode]);
+    const prev = new Map();
+
+    while(q.length){
+      const cur = q.shift();
+      const nexts = neighbors.get(cur) || [];
+      for(const nb of nexts){
+        if(seen.has(nb)) continue;
+        seen.add(nb);
+        prev.set(nb, cur);
+        if(nb === targetNode){
+          const path = [nb];
+          let t = nb;
+          while(prev.has(t)){
+            t = prev.get(t);
+            path.push(t);
+          }
+          path.reverse();
+          return path;
+        }
+        q.push(nb);
+      }
+    }
+    return null;
+  }
+
+  // UI
+  const $ = (sel)=>document.querySelector(sel);
+  const g1 = $('#g1'), g2 = $('#g2');
+  const goBtn = $('#goBtn');
+  const randomBtn = $('#randomBtn');
+  const swapBtn = $('#swapBtn');
+  const msg = $('#msg');
+  const res = $('#results');
+  const stepsEl = $('#steps');
+  const headline = $('#headline');
+  const summary = $('#summary');
+
+  function findDisplayGroup(input){
+    const key = norm(input || '');
+    if(!key) return null;
+    if(allGroupsSet.has(key)) return allGroupsSet.get(key);
+    for(const [k,v] of allGroupsSet.entries()){
+      if(k.startsWith(key)) return v;
+    }
+    return null;
+  }
+
+  function showMessage(t, tone=''){
+    msg.innerHTML = t;
+    msg.className = 'msg ' + (tone ? tone : '');
+    res.hidden = true;
+  }
+
+  function renderPath(path){
+    stepsEl.innerHTML = '';
+    if(!path || path.length < 2){
+      summary.innerHTML = '<span class="warning">Las bandas son iguales o no hay pasos.</span>';
+      res.hidden = false;
+      return;
+    }
+    const edges = path.length - 1;
+    summary.innerHTML = `Cadena mínima encontrada: <b>${edges}</b> paso${edges===1?'':'s'}.`;
+
+    let stepNum = 1;
+    for(let i=0; i<path.length-1; i++){
+      const a = path[i], b = path[i+1];
+      const aType = a.slice(0,2), bType = b.slice(0,2);
+      const aName = a.slice(2), bName = b.slice(2);
+
+      // roles: siempre (persona, grupo)
+      let personName=null, groupName=null;
+      if(aType==='g:' && bType==='p:'){ personName=bName; groupName=aName; }
+      else if(aType==='p:' && bType==='g:'){ personName=aName; groupName=bName; }
+
+      const roles = personName && groupName ? formatRoles(getRolesArr(personName, groupName)) : null;
+      const rolesHTML = roles ? ` <span class="muted">como: ${roles}</span>` : '';
+
+      let text = '';
+      if(aType === 'g:' && bType === 'p:'){
+        text = `Miembro de <span class="node group">${aName}</span>: <span class="node person">${bName}</span>${rolesHTML}`;
+      } else if(aType === 'p:' && bType === 'g:'){
+        text = `<span class="node person">${aName}</span> fue miembro de: <span class="node group">${bName}</span>${rolesHTML}`;
+      } else {
+        text = `<span class="node">${aName}</span> → <span class="node">${bName}</span>`;
+      }
+
+      const card = document.createElement('div');
+      card.className = 'step';
+      card.innerHTML = `<div class="num">${stepNum++}</div><div>${text}</div>`;
+      stepsEl.appendChild(card);
+    }
+    res.hidden = false;
+  }
+
+  function connect(){
+    const in1 = g1.value.trim();
+    const in2 = g2.value.trim();
+    const d1 = findDisplayGroup(in1);
+    const d2 = findDisplayGroup(in2);
+
+    if(!d1){
+      showMessage('Parece que no pudimos encontrar esa banda... capaz querés probar con otra (Banda A).', 'warning');
+      return;
+    }
+    if(!d2){
+      showMessage('Parece que no pudimos encontrar esa banda... capaz querés probar con otra (Banda B).', 'warning');
+      return;
+    }
+
+    headline.textContent = `Resultado: ${d1} ↔ ${d2}`;
+
+    const path = bfsGroupToGroup(d1, d2);
+    if(!path){
+      showMessage('No encontramos una conexión con la info disponible. Probá con otras bandas o usá ALEATORIO.', 'danger');
+      return;
+    }
+    msg.className = 'sr'; msg.textContent = '';
+    renderPath(path);
+  }
+
+  goBtn.addEventListener('click', connect);
+  g1.addEventListener('keydown', e=>{ if(e.key==='Enter') connect(); });
+  g2.addEventListener('keydown', e=>{ if(e.key==='Enter') connect(); });
+
+  randomBtn.addEventListener('click', ()=>{
+    if(allGroups.length < 2){ showMessage('No hay suficientes bandas para elegir.', 'danger'); return; }
+    let i = Math.floor(Math.random()*allGroups.length);
+    let j = Math.floor(Math.random()*allGroups.length);
+    if(i===j) j = (j+1) % allGroups.length;
+    g1.value = allGroups[i];
+    g2.value = allGroups[j];
+    connect();
+  });
+
+  swapBtn.addEventListener('click', ()=>{
+    const t = g1.value;
+    g1.value = g2.value;
+    g2.value = t;
+  });
+</script>
+</body>
+</html>
