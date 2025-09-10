@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>ConectAR — Conectar Bandas Argentinas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
@@ -42,12 +42,15 @@
     * { box-sizing: border-box; }
     body{
       margin:0; background:
-        radial-gradient(1200px 600px at 10% -10%, rgba(167,139,250,.18), transparent 60%),
-        radial-gradient(800px 600px at 110% 10%, rgba(110,231,255,.12), transparent 60%),
-        var(--bg);
+        radial-gradient(ellipse 120vmax 70vmax at 15% -12%, rgba(167,139,250,.18) 0 60%, transparent 60.1%),
+        radial-gradient(ellipse 100vmax 80vmax at 115% 8%, rgba(110,231,255,.12) 0 60%, transparent 60.1%),
+        var(--bg, #0f1220);
+       background-attachment: scroll;
+       background-repeat: no-repeat;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Ubuntu, Cantarell, "Noto Sans", "DejaVu Sans", Arial, "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
       color: var(--text);
       min-height: 100vh;
+      min-height: 100dvh;
       display: grid;
       place-items: start center;
       padding: 40px 16px 80px;
@@ -139,6 +142,28 @@
     .dot.person{ background: var(--ok) }
     .dot.group{ background: #e0e4ff }
     .sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip: rect(1px,1px,1px,1px); white-space:nowrap }
+    }
+    @media (max-width: 720px){
+    .row{
+     grid-template-columns: 1fr;
+     gap: 10px;
+     align-items: stretch;
+    }
+    .divider{
+     order: -1;
+     margin: 6px 0 2px;
+     display: flex; justify-content: center;
+    }
+    .actions{
+     justify-content: stretch;
+    }
+    .actions .btn{
+     flex: 1 1 auto;
+    }
+    .app{
+     padding: 16px;
+    }
+}
   </style>
 </head>
 <body>
@@ -186,7 +211,7 @@
     </section>
 
     <footer>
-      Datos incrustados desde: <em> Wikipedia, RateYourMusic, Rock.com.ar, Octavado, La Nave del Rock Argentino</em>.
+      Datos incrustados desde el TXT provisto. Si una banda no figura, verás: <em>“parece que no pudimos encontrar esa banda... capaz querés probar con otra”</em>.
     </footer>
   </div>
 
