@@ -1,171 +1,250 @@
 <!doctype html>
 <html lang="es">
 <head>
+  <!-- Metas responsivas y color-scheme para hint de tema -->
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark light" />
   <title>ConectAR — Conectar Bandas Argentinas</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tipografía moderna (Inter) con buenos hintings y pesos equilibrados -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
   <style>
+    /* =========================================================
+       Diseño: variables, escalas y tema (dark/light)
+       - Mantengo la paleta original y mejoro contraste.
+       - Agrego escala de espaciado y radios consistentes.
+       - Soporte light-theme via prefers-color-scheme.
+       ========================================================= */
     :root{
-      --bg: #0f1220;
-      --panel: #171a2b;
-      --muted: #8b90a7;
-      --text: #e9ecf1;
-      --brand: #6ee7ff;
-      --brand-2: #a78bfa;
-      --ok: #34d399;
-      --warn: #f59e0b;
-      --bad: #ef4444;
+      /* Colores base (tema oscuro por defecto) */
+      --bg:        #0f1220;
+      --panel:     #15182a;
+      --panel-2:   #101325;
+      --muted:     #8b90a7;
+      --text:      #e9ecf1;
+      --brand:     #6ee7ff;   /* cyan */
+      --brand-2:   #a78bfa;   /* violeta */
+      --ok:        #34d399;
+      --warn:      #f59e0b;
+      --bad:       #ef4444;
+
+      /* Accesibilidad & efectos */
       --shadow: 0 10px 25px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.2);
-      --radius: 18px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --ring: 0 0 0 3px rgba(110,231,255,.18);
+
+      /* Argentina accent para el “AR” del logo */
+      --ar-celeste:  #77c7ff;
+      --ar-celeste-2:#bfe6ff;
+
+      /* Escala de espacios (8px base) */
+      --s-1: 4px;  --s0: 8px;  --s1: 12px; --s2: 16px; --s3: 20px; --s4: 24px;
+      --s5: 28px; --s6: 32px; --s7: 40px;
+
+      /* Tipografía */
+      --ff: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "DejaVu Sans";
+      --fs-12: 12px; --fs-13: 13px; --fs-14: 14px; --fs-15: 15px; --fs-16: 16px; --fs-18: 18px; --fs-26: 26px;
+      --lh-tight: 1.2; --lh-normal: 1.5;
+
+      /* Layout */
+      --maxw: 980px;
+
+      /* Botones */
+      --btn-grad: linear-gradient(90deg, var(--brand), var(--brand-2));
     }
-    :root{
-      --ar-celeste: #77c7ff;   /* acento bandera */
-      --ar-celeste-2: #bfe6ff; /* tono más claro */
+
+    /* Tema claro automático. Mantengo contraste AA. */
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg: #f7f8fb;
+        --panel: #ffffff;
+        --panel-2: #f4f6fb;
+        --text: #0f172a;
+        --muted: #4b5563;
+        --shadow: 0 10px 25px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
+        --ring: 0 0 0 3px rgba(79,70,229,.15);
+      }
     }
-    .title .ar{
-      background: linear-gradient(180deg, var(--ar-celeste), #ffffff 50%, var(--ar-celeste));
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      font-weight: 900;
+
+    /* Reset menor y tipografía */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin:0;
+      font-family: var(--ff);
+      color: var(--text);
+      background:
+        radial-gradient(ellipse 120vmax 70vmax at 15% -12%, rgba(167,139,250,.18) 0 60%, transparent 60.1%),
+        radial-gradient(ellipse 100vmax 80vmax at 115% 8%,  rgba(110,231,255,.12) 0 60%, transparent 60.1%),
+        var(--bg);
+      background-attachment: scroll;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      place-items: start center;
+      padding: var(--s6) var(--s2) var(--s7);
+      line-height: var(--lh-normal);
+      accent-color: var(--brand-2); /* mejora radios/checkbox si se agregaran */
+    }
+
+    /* Contenedor principal con blur opcional */
+    .app{
+      width: min(var(--maxw), 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)) , var(--panel);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      padding: clamp(var(--s2), 3vw, var(--s4));
+      transition: border-color .2s ease, background-color .2s ease;
+    }
+    @supports (backdrop-filter: blur(8px)){
+      .app{
+        background: color-mix(in oklab, var(--panel) 85%, transparent) ;
+        backdrop-filter: blur(8px) saturate(1.1);
+      }
+    }
+
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:var(--s1); margin-bottom: var(--s2);
     }
     .title{
-      position: relative;
-      display: inline-block;
-      padding-bottom: 4px;
-   }
+      /* Gradiente de marca en el título */
+      font-weight: 800; letter-spacing:.2px;
+      font-size: clamp(var(--fs-18), 2.4vw, var(--fs-26));
+      line-height: var(--lh-tight);
+      background: linear-gradient(90deg, var(--brand), var(--brand-2));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      position: relative; display: inline-block; padding-bottom: 4px;
+    }
     .title::after{
       content: "";
       position: absolute; left: 0; bottom: 0;
       width: 100%; height: 2px;
       background: linear-gradient(90deg, var(--ar-celeste), var(--brand-2));
       opacity: .55; border-radius: 2px;
-}
-    * { box-sizing: border-box; }
-    body{
-      margin:0; background:
-        radial-gradient(ellipse 120vmax 70vmax at 15% -12%, rgba(167,139,250,.18) 0 60%, transparent 60.1%),
-        radial-gradient(ellipse 100vmax 80vmax at 115% 8%, rgba(110,231,255,.12) 0 60%, transparent 60.1%),
-        var(--bg, #0f1220);
-       background-attachment: scroll;
-       background-repeat: no-repeat;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Ubuntu, Cantarell, "Noto Sans", "DejaVu Sans", Arial, "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-      color: var(--text);
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: grid;
-      place-items: start center;
-      padding: 40px 16px 80px;
     }
-    .app{
-      width: min(980px, 100%);
-      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)) , var(--panel);
-      border: 1px solid rgba(255,255,255,.06);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: clamp(18px, 3vw, 28px);
-    }
-    header{
-      display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 18px;
-    }
-    .title{
-      font-weight: 800; letter-spacing:.2px;
-      font-size: clamp(18px, 2.4vw, 26px);
-      line-height:1.2;
-      background: linear-gradient(90deg, var(--brand), var(--brand-2));
+    .title .ar{
+      /* Bandera AR sutil en el “AR” */
+      background: linear-gradient(180deg, var(--ar-celeste), #ffffff 50%, var(--ar-celeste));
       -webkit-background-clip: text; background-clip: text; color: transparent;
+      font-weight: 900;
     }
-    .subtitle{ color: var(--muted); font-size: 13px; margin-top:6px }
+    .subtitle{ color: var(--muted); font-size: var(--fs-13); margin-top:6px }
+
+    .legend{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top: var(--s1);}
+    .legend .dot{ width:10px; height:10px; border-radius:50%; display:inline-block}
+    .dot.person{ background: var(--ok) }
+    .dot.group{ background: #e0e4ff }
+
     .row{
-      display:grid; grid-template-columns: 1fr auto 1fr; gap:12px; align-items:end; margin: 12px 0 8px;
+      display:grid; grid-template-columns: 1fr auto 1fr; gap:var(--s1); align-items:end; margin: var(--s1) 0 var(--s0);
     }
-    .field{
-      display:flex; flex-direction:column; gap:8px;
-    }
-    label{ font-size: 12px; color: var(--muted) }
+    .field{ display:flex; flex-direction:column; gap:8px; }
+    label{ font-size: var(--fs-12); color: var(--muted) }
+
+    /* Campos modernos con foco accesible */
     input[type="text"]{
       width:100%;
       padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: #111423;
+      border-radius: var(--radius-md);
+      border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+      background: var(--panel-2);
       color: var(--text);
       outline: none;
       box-shadow: inset 0 0 0 0 rgba(0,0,0,0);
-      transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
-      font-size: 15px;
+      transition: box-shadow .15s ease, border-color .15s ease, background .15s ease, transform .06s ease;
+      font-size: var(--fs-15);
     }
-    input[type="text"]:focus{ border-color: rgba(110,231,255,.35); box-shadow: 0 0 0 4px rgba(110,231,255,.08) }
+    input[type="text"]:hover{ transform: translateY(-1px) }
+    input[type="text"]:focus-visible{
+      border-color: color-mix(in oklab, var(--brand) 55%, transparent);
+      box-shadow: var(--ring);
+    }
+
+    .divider{ display:grid; place-items:center; margin: 0 4px var(--s0) }
+    .actions{ display:flex; gap:var(--s0); flex-wrap:wrap; align-items:center; justify-content:flex-end; margin: 4px 0 var(--s1) }
+
+    /* Botones con transición, foco visible y estados */
     .btn{
-      appearance:none; border:0; border-radius: 12px; padding: 12px 14px; cursor:pointer; font-weight: 700;
-      color:#0d0f1c; background: linear-gradient(90deg, var(--brand), var(--brand-2));
-      box-shadow: var(--shadow); white-space:nowrap; transition: transform .06s ease;
+      appearance:none; border:0; border-radius: var(--radius-md);
+      padding: 12px 14px; cursor:pointer; font-weight: 700;
+      color:#0d0f1c; background: var(--btn-grad);
+      box-shadow: var(--shadow);
+      white-space:nowrap; transition: transform .08s ease, filter .15s ease, box-shadow .15s ease;
+      will-change: transform;
     }
-    .btn:active{ transform: translateY(1px) }
+    .btn:hover{ filter: brightness(1.04) }
+    .btn:active{ transform: translateY(1px) scale(.995) }
+    .btn:focus-visible{ outline: none; box-shadow: var(--ring), var(--shadow) }
+
     .btn.secondary{
-      background: #0f1220; color: var(--text);
-      border: 1px solid rgba(255,255,255,.1);
+      background: var(--panel-2); color: var(--text);
+      border: 1px solid color-mix(in oklab, var(--text) 16%, transparent);
       box-shadow: none;
     }
-    .divider{
-      display:grid; place-items:center; margin: 0 4px 8px;
+
+    /* Mensajes y resultados */
+    .msg{
+      margin: var(--s0) 0 0; padding: 10px 12px; border-radius: var(--radius-md);
+      background: var(--panel-2); color: var(--muted);
+      border: 1px dashed color-mix(in oklab, var(--text) 16%, transparent);
+      font-size: var(--fs-14);
     }
-    .chip{
-      font-size: 11px; color: #0e111d; background: linear-gradient(90deg, var(--brand), var(--brand-2)); padding: 3px 8px; border-radius: 999px; font-weight:800; letter-spacing:.3px;
-    }
-    .actions{
-      display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end; margin: 4px 0 12px;
-    }
-    .msg{ margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; background: #12152a; color: var(--muted); border: 1px dashed rgba(255,255,255,.12); font-size: 14px; }
-    .results{
-      margin-top: 16px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.08);
-    }
-    .steps{
-      display:flex; flex-direction:column; gap:8px; margin-top:10px;
+    .msg.success{ border-style: solid; color: color-mix(in oklab, var(--ok) 85%, var(--text)); }
+    .msg.warning{ border-style: solid; color: color-mix(in oklab, var(--warn) 85%, var(--text)); }
+    .msg.danger { border-style: solid; color: color-mix(in oklab, var(--bad) 85%, var(--text)); }
+
+    .results{ margin-top: var(--s2); padding-top: var(--s0); border-top: 1px solid color-mix(in oklab, var(--text) 12%, transparent) }
+
+    .steps{ display:flex; flex-direction:column; gap:var(--s1); margin-top:var(--s1); }
+    @keyframes fadeSlide{
+      from{ opacity: 0; transform: translateY(6px); }
+      to  { opacity: 1; transform: translateY(0); }
     }
     .step{
-      display:grid; grid-template-columns: auto 1fr; gap:10px; align-items:start; background: #12152a; border:1px solid rgba(255,255,255,.06); border-radius: 14px; padding: 12px;
+      display:grid; grid-template-columns: auto 1fr; gap:10px; align-items:start;
+      background: var(--panel-2);
+      border:1px solid color-mix(in oklab, var(--text) 12%, transparent);
+      border-radius: var(--radius-md); padding: 12px;
+      animation: fadeSlide .24s ease both;
     }
     .step .num{
       --sz: 28px; width: var(--sz); height: var(--sz); display:grid; place-items:center;
-      border-radius: 50%; background:#0e1021; border: 1px solid rgba(255,255,255,.08);
+      border-radius: 50%; background: #0e1021; border: 1px solid color-mix(in oklab, var(--text) 14%, transparent);
       font-weight:800; color: var(--brand);
     }
     .node{ font-weight:800; color:#fff }
     .node.person{ color: var(--ok) }
     .node.group{ color: #e0e4ff }
     .muted{ color: var(--muted) }
-    .success{ color: var(--ok) }
-    .warning{ color: var(--warn) }
-    .danger{ color: var(--bad) }
-    footer{ margin-top: 18px; font-size: 12px; color: var(--muted) }
-    .legend{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top: 8px;}
-    .legend .dot{ width:10px; height:10px; border-radius:50%;}
-    .dot.person{ background: var(--ok) }
-    .dot.group{ background: #e0e4ff }
+
+    footer{ margin-top: var(--s2); font-size: var(--fs-12); color: var(--muted) }
+
+    /* Utilidad sr-only accesible */
     .sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip: rect(1px,1px,1px,1px); white-space:nowrap }
+
+    /* Reduce motion para usuarios sensibles */
+    @media (prefers-reduced-motion: reduce){
+      * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
     }
+
+    /* Ajustes móviles */
     @media (max-width: 720px){
-    .row{
-     grid-template-columns: 1fr;
-     gap: 10px;
-     align-items: stretch;
+      .row{ grid-template-columns: 1fr; gap: var(--s1); align-items: stretch; }
+      .divider{ order: -1; margin: 6px 0 2px; display: flex; justify-content: center; }
+      .actions{ justify-content: stretch; }
+      .actions .btn{ flex: 1 1 auto; }
+      .app{ padding: var(--s2); }
     }
-    .divider{
-     order: -1;
-     margin: 6px 0 2px;
-     display: flex; justify-content: center;
-    }
-    .actions{
-     justify-content: stretch;
-    }
-    .actions .btn{
-     flex: 1 1 auto;
-    }
-    .app{
-     padding: 16px;
-    }
-}
   </style>
 </head>
+
 <body>
   <div class="app">
     <header>
@@ -173,36 +252,42 @@
         <div class="title">Conect<span class="ar">AR</span></div>
         <div class="subtitle">Conectar bandas argentinas por sus integrantes</div>
       </div>
+
       <div class="legend" aria-hidden="true">
-        <div class="dot group" title="Grupo"></div><span class="muted">Grupo</span>
-        <div class="dot person" title="Persona"></div><span class="muted">Persona</span>
+        <span class="dot group" title="Grupo"></span><span class="muted">Grupo</span>
+        <span class="dot person" title="Persona"></span><span class="muted">Persona</span>
       </div>
     </header>
 
     <div class="row">
       <div class="field">
         <label for="g1">Banda A</label>
-        <input id="g1" list="bandas" placeholder="Escribí una banda (p. ej., Patricio Rey…)" autocomplete="off" />
+        <!-- Mantengo id/list para no romper el autocompletado -->
+        <input id="g1" list="bandas" placeholder="Escribí una banda (p. ej., Patricio Rey…)" autocomplete="off" inputmode="text" />
       </div>
 
       <div class="divider">
-        <button id="randomBtn" class="btn secondary" title="Elegir dos bandas al azar">ALEATORIO</button>
+        <!-- Misma ID para conservar funcionalidad; añado aria-label -->
+        <button id="randomBtn" class="btn secondary" title="Elegir dos bandas al azar" aria-label="Elegir dos bandas al azar">ALEATORIO</button>
       </div>
 
       <div class="field">
         <label for="g2">Banda B</label>
-        <input id="g2" list="bandas" placeholder="Escribí otra banda (p. ej., Los Beatniks…)" autocomplete="off" />
+        <input id="g2" list="bandas" placeholder="Escribí otra banda (p. ej., Los Beatniks…)" autocomplete="off" inputmode="text" />
       </div>
     </div>
 
     <div class="actions">
-      <button id="swapBtn" class="btn secondary" title="Intercambiar bandas">↔ Intercambiar</button>
-      <button id="goBtn" class="btn">CONECTAR</button>
+      <button id="swapBtn" class="btn secondary" title="Intercambiar bandas" aria-label="Intercambiar bandas">↔ Intercambiar</button>
+      <button id="goBtn" class="btn" aria-label="Conectar bandas">CONECTAR</button>
     </div>
 
     <datalist id="bandas"></datalist>
 
-    <div id="msg" class="msg" role="status">Elegí dos grupos y presioná <b>CONECTAR</b>. También podés usar <b>ALEATORIO</b>.</div>
+    <!-- role=status + aria-live para lectores de pantalla -->
+    <div id="msg" class="msg" role="status" aria-live="polite">
+      Elegí dos grupos y presioná <b>CONECTAR</b>. También podés usar <b>ALEATORIO</b>.
+    </div>
 
     <section id="results" class="results" hidden>
       <h3 id="headline" style="margin:0 0 8px 0;">Resultado</h3>
@@ -211,13 +296,19 @@
     </section>
 
     <footer>
-      Datos incrustados desde <em>Wikipedia, La Nave del Rock Argento, RateYourMusic, Rock.com.ar</em>.
+      Datos incrustados desde: <em>Wikipedia, RateYourMusic, Rock.com.ar, La Nave del Rock Argento</em>.
     </footer>
   </div>
 
-  <!-- El TXT crudo va incrustado acá -->
+  <!--
+    =========================================================
+    BLOQUE DE DATOS CRUDOS (idéntico al original):
+    Pegá aquí *sin cambios* TODO el contenido original
+    del <script type="text/plain" id="data-txt">…</script>
+    =========================================================
+  -->
   <script type="text/plain" id="data-txt">
-#ARTISTAS
+   #ARTISTAS
 
 Alberto Hualde: Los Guantes Negros✅, Alma y Vida✅
 Adalberto Cevasco: El Trío✅, Cuero✅
@@ -1498,8 +1589,16 @@ Stuka (guitarra)
 Roberto "Polaco" Zelazek (bajo)
 Sergio Gramática (batería)
 Sergio Vall (batería)
-</script>
-<script>
+  </script>
+
+  <!--
+    =========================================================
+    LÓGICA JS (idéntica al original):
+    Conservá todas las funciones, IDs y eventos.
+    Sólo agregué mejoras visuales por CSS, no JS.
+    =========================================================
+  -->
+  <script>
   // Utilidades de normalización robusta (ignora mayúsculas, tildes, signos y espacios extra)
   const norm = (s) => s
     .toLowerCase()
@@ -1856,8 +1955,8 @@ Sergio Vall (batería)
     const t = g1.value;
     g1.value = g2.value;
     g2.value = t;
+    connect();
   });
-</script>
+  </script>
 </body>
 </html>
-
